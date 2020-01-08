@@ -1,0 +1,82 @@
+---
+
+- name: Upgrade All Packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: yes
+
+- name: Install Dependancies
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - unzip
+
+- name: Install Consul
+  unarchive:
+    src: https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/consul/ent/1.7.0/consul-enterprise_1.7.0%2Bent-beta2_linux_amd64.zip
+    dest: /usr/local/bin
+    remote_src: yes
+
+- name: Consul Permissions
+  file:
+    path: /usr/local/bin/consul
+    owner: root
+    group: root
+
+- name: Consul User
+  user:
+    name: consul
+    comment: Consul Service Account
+    shell: /bin/false
+    home: /etc/consul.d
+    system: yes
+
+- name: Create /opt/consul Directory
+  file:
+    path: /opt/consul
+    recurse: yes
+    owner: consul
+    group: consul
+    state: directory
+
+- name: Copy Systemd Unit File
+  copy:
+    src: ./files/consul.service
+    dest: /etc/systemd/system/consul.service
+
+- name: Create /etc/consul.d Directory
+  file:
+    path: /etc/consul.d
+    recurse: yes
+    owner: consul
+    group: consul
+    state: directory
+
+- name: Template Consul Configuration File
+  template:
+    src: ./template/consul.hcl.j2
+    dest: /etc/consul.d/consul.hcl
+    owner: consul
+    group: consul
+    mode: '0640'
+
+- name: Template Server Configuration File
+  template:
+    src: ./template/server.hcl.j2
+    dest: /etc/consul.d/server.hcl
+    owner: consul
+    group: consul
+    mode: '0640'
+
+- name: Enable and Start Consul Service
+  systemd:
+    name: consul
+    state: started
+    enabled: yes
+
+- name: Apply Consul License Blob
+  command: /usr/local/bin/consul license put "{{ consul_license_blob }}"
+  tags:
+    - consul_license

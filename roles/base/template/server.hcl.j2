@@ -1,0 +1,7 @@
+{% if 'true' in consul_server | default('false') %}
+server = true
+bootstrap_expect = 3
+ui = true
+{% else %}
+server = false
+{% endif %}
