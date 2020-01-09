@@ -9,3 +9,8 @@
 # gcp_project = {{ GCP Project Name }}
 # admin_source_ip = {{ admin external NAT IP }}
 # ssh_username = {{ ssh username }}
+
+# Default client and network counts are also 2 x 2.  The number of clients created are per network.  In this case, 4 total clients.  2 per network
+
+client_node_count = 2
+network_count = 2
