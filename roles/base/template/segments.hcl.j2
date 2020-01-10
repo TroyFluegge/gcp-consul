@@ -1,0 +1,13 @@
+{% if 'true' in consul_server | default('false') %}
+{% set port = 8302 %}
+{% for segment in network_segments %}
+segments = {
+advertise = {% raw %}"{{GetPrivateIP}}"
+{% endraw %}
+bind = {% raw %}"{{GetPrivateIP}}"
+{% endraw %}
+name = "{{ segment }}"
+port = {{ port + loop.index }}
+}
+{% endfor %}
+{% endif %}

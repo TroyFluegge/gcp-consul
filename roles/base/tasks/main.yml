@@ -12,6 +12,8 @@
   vars:
     packages:
     - unzip
+    - nc
+    - tcpdump
 
 - name: Install Consul
   unarchive:
@@ -54,6 +56,14 @@
     group: consul
     state: directory
 
+- name: Get Network Segment Name From Metadata
+  uri: 
+    url: http://metadata.google.internal/computeMetadata/v1/instance/attributes/subnet-name
+    return_content: yes
+    headers:
+      Metadata-Flavor: Google
+  register: subnet_name
+
 - name: Template Consul Configuration File
   template:
     src: ./template/consul.hcl.j2
@@ -66,6 +76,14 @@
   template:
     src: ./template/server.hcl.j2
     dest: /etc/consul.d/server.hcl
+    owner: consul
+    group: consul
+    mode: '0640'
+
+- name: Template Network Segments Configuration File
+  template:
+    src: ./template/segments.hcl.j2
+    dest: /etc/consul.d/segments.hcl
     owner: consul
     group: consul
     mode: '0640'
