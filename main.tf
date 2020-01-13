@@ -1,6 +1,6 @@
 locals {
   client_placement   = setproduct(google_compute_subnetwork.networks[*], range(var.client_node_count))
-  segment_port_range = setproduct((range(var.segment_start_port, length(google_compute_subnetwork.networks[*]) + var.segment_start_port, 1)), google_compute_subnetwork.networks[*])
+  segment_port_range = zipmap(google_compute_subnetwork.networks[*].name, (range(var.segment_start_port, length(google_compute_subnetwork.networks[*]) + var.segment_start_port, 1)))
 }
 
 provider "google" {
@@ -55,7 +55,7 @@ resource "google_compute_instance" "client_instance" {
   metadata = {
     enable-guest-attributes = true,
     subnet-name             = basename(element(local.client_placement, count.index)[0].self_link)
-    consul-segment-port     = tostring(format("%#v", (element(local.segment_port_range, count.index)[0])))
+    consul-segment-port     = lookup(local.segment_port_range, basename(element(local.client_placement, count.index)[0].self_link))
   }
   provisioner "remote-exec" {
     connection {
