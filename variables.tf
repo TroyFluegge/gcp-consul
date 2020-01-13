@@ -64,3 +64,9 @@ variable "network_count" {
   description = "The number of network segments. Each network will have {{ client_node_count }} number of clients"
   default     = "2"
 }
+
+variable "segment_start_port" {
+  description = "Each consul segment needs unique TCP ports to connect to server side.  This is the starting port number.  Each segment will increase by one"
+  default     = "8303"
+}
+

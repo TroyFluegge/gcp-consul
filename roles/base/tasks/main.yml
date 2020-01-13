@@ -64,6 +64,17 @@
       Metadata-Flavor: Google
   register: subnet_name
 
+# This errors on the servers since segment ports are not added to the metadata.  
+# I could put a task tag on this for clients but I got lazy
+- name: Get Network Segment Port Number From Metadata
+  uri: 
+    url: http://metadata.google.internal/computeMetadata/v1/instance/attributes/consul-segment-port
+    return_content: yes
+    headers:
+      Metadata-Flavor: Google
+  register: subnet_port
+  ignore_errors: yes
+
 - name: Template Consul Configuration File
   template:
     src: ./template/consul.hcl.j2

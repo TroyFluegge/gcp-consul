@@ -1,7 +1,12 @@
 datacenter = "dc1"
 data_dir = "/opt/consul"
-start_join = {{ node_server_ips }}
+{# start_join = {{ node_server_ips }} #}
+{% if 'false' in consul_server | default('false') %}
+start_join = [{% for node in node_server_ips %}"{{ node }}:{{ subnet_port.content | basename }}"{% if not loop.last %},{% endif %}{% endfor %}]
+{% else %}
+start_join = [{% for node in node_server_ips %}"{{ node }}"{% if not loop.last %},{% endif %}{% endfor %}]
+{% endif %}
 client_addr = "0.0.0.0"
 {% if 'false' in consul_server | default('false') %}
-segments = "{{ subnet_name.content | basename }}"
+segment = "{{ subnet_name.content | basename }}"
 {% endif %}
