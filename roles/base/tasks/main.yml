@@ -113,15 +113,10 @@
     state: started
     enabled: yes
 
-- debug:
-    var: consul_license_blob
-  tags:
-    - single_node_cmds
-
 - name: Apply Consul License Blob
   command: /usr/local/bin/consul license put "{{ consul_license_blob }}"
   tags:
-    - single_node_cmds
+    - apply_consul_license
 
 - name: Create /etc/prometheus Directory
   file:

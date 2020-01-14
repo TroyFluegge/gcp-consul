@@ -1,5 +1,5 @@
 {% if 'true' in consul_server | default('false') %}
-{% set port = 8302 %}
+{% set port = segment_start_port | int - 1 %}
 {% for segment in network_segments %}
 segments = {
 advertise = {% raw %}"{{GetInterfaceIP \"eth0\"}}"
