@@ -6,7 +6,9 @@ This project uses Ansible in a null_resource local-exec provisioner.  Everytime 
 
 Run the normal Terraform commands and you should be good to go!
 `terraform init`
+
 `terraform plan`
+
 `terraform apply`
 
 I added prometheus and grafana containers onto one of the nodes.  The outputs will output the url and port.  There isn't much going on there yet.  I plan to add some custom dashboards to display gossip errors due to network segmentation and how network segments fixes those types of issues.  Right now, you can add a prometheus datasource in grafana buy using the internal IP of the prometheus server `http://10.10.0.2:9090` (if you didn't change the CIDR range).  Then you can make any dashboard you want with that datasource.
