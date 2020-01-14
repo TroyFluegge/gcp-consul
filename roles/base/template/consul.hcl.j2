@@ -7,6 +7,9 @@ start_join = [{% for node in node_server_ips %}"{{ node }}:{{ subnet_port.conten
 start_join = [{% for node in node_server_ips %}"{{ node }}"{% if not loop.last %},{% endif %}{% endfor %}]
 {% endif %}
 client_addr = "0.0.0.0"
+bind_addr = {% raw %}"{{GetInterfaceIP \"eth0\"}}"
+{% endraw %}
 {% if 'false' in consul_server | default('false') %}
 segment = "{{ subnet_name.content | basename }}"
 {% endif %}
+telemetry { prometheus_retention_time = "4s" }

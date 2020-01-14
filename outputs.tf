@@ -22,3 +22,13 @@ output "consul_ui" {
   description = "URL to the Consul UI"
   value       = "http://${google_compute_instance.server_instance[0].network_interface[0].access_config[0].nat_ip}:8500/ui"
 }
+
+output "grafana_ui" {
+  description = "URL to the Consul UI"
+  value       = "http://${google_compute_instance.server_instance[0].network_interface[0].access_config[0].nat_ip}:3000"
+}
+
+output "prometheus_ui" {
+  description = "URL to the Consul UI"
+  value       = "http://${google_compute_instance.server_instance[0].network_interface[0].access_config[0].nat_ip}:9090"
+}

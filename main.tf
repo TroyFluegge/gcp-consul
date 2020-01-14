@@ -85,7 +85,7 @@ resource "google_compute_firewall" "ssh_rules" {
   source_ranges = [var.admin_source_ip]
   allow {
     protocol = "tcp"
-    ports    = ["22", "8500"]
+    ports    = ["22", "8500", "3000", "9090"]
   }
 }
 
@@ -104,7 +104,7 @@ resource "null_resource" "server_instances" {
     build_number = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "ansible-playbook -u '${var.ssh_username}' -i '${tostring(join(",", google_compute_instance.server_instance[*].network_interface[0].access_config[0].nat_ip))}' --private-key '${var.private_key}' provision.yml --extra-vars consul_server=true --extra-vars {\"node_server_ips\":'${tostring(format("%#v", google_compute_instance.server_instance[*].network_interface[0].network_ip))}}' --extra-vars '{\"network_segments\":${format("%#v", google_compute_subnetwork.networks[*].name)}}' --skip-tags consul_license"
+    command = "ansible-playbook -u '${var.ssh_username}' -i '${tostring(join(",", google_compute_instance.server_instance[*].network_interface[0].access_config[0].nat_ip))}' --private-key '${var.private_key}' provision.yml --extra-vars consul_server=true --extra-vars {\"node_server_ips\":'${tostring(format("%#v", google_compute_instance.server_instance[*].network_interface[0].network_ip))}}' --extra-vars '{\"network_segments\":${format("%#v", google_compute_subnetwork.networks[*].name)}}' --skip-tags single_node_cmds"
   }
 }
 
@@ -113,17 +113,17 @@ resource "null_resource" "client_instances" {
     build_number = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "ansible-playbook -u '${var.ssh_username}' -i '${tostring(join(",", google_compute_instance.client_instance[*].network_interface[0].access_config[0].nat_ip))}' --private-key '${var.private_key}' provision.yml --extra-vars consul_server=false --extra-vars {\"node_server_ips\":'${tostring(format("%#v", google_compute_instance.server_instance[*].network_interface[0].network_ip))}}' --extra-vars '{\"network_segments\":${format("%#v", google_compute_subnetwork.networks[*].name)}}' --skip-tags consul_license"
+    command = "ansible-playbook -u '${var.ssh_username}' -i '${tostring(join(",", google_compute_instance.client_instance[*].network_interface[0].access_config[0].nat_ip))}' --private-key '${var.private_key}' provision.yml --extra-vars consul_server=false --extra-vars {\"node_server_ips\":'${tostring(format("%#v", google_compute_instance.server_instance[*].network_interface[0].network_ip))}}' --extra-vars '{\"network_segments\":${format("%#v", google_compute_subnetwork.networks[*].name)}}' --skip-tags single_node_cmds"
   }
   depends_on = [null_resource.server_instances]
 }
 
-resource "null_resource" "consul_license_apply" {
+resource "null_resource" "single_node_cmds" {
   triggers = {
     build_number = "${timestamp()}"
   }
   provisioner "local-exec" {
-    command = "if [ ! -z '${var.consul_license_blob}' ]; then ansible-playbook -u '${var.ssh_username}' -i '${google_compute_instance.server_instance[0].network_interface[0].access_config[0].nat_ip},' --private-key '${var.private_key}' provision.yml --tags consul_license --extra-vars consul_license_blob='${var.consul_license_blob}'; fi"
+    command = "if [ ! -z '${var.consul_license_blob}' ]; then ansible-playbook -u '${var.ssh_username}' -i '${google_compute_instance.server_instance[0].network_interface[0].access_config[0].nat_ip},' --private-key '${var.private_key}' provision.yml --extra-vars {\"node_server_ips\":'${tostring(format("%#v", google_compute_instance.server_instance[*].network_interface[0].network_ip))}}' --extra-vars consul_license_blob='${var.consul_license_blob}' --tags single_node_cmds; fi"
   }
   depends_on = [null_resource.server_instances]
 }

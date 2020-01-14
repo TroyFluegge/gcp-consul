@@ -14,6 +14,8 @@
     - unzip
     - nc
     - tcpdump
+    - docker
+    - docker-python
 
 - name: Install Consul
   unarchive:
@@ -111,7 +113,55 @@
     state: started
     enabled: yes
 
+- debug:
+    var: consul_license_blob
+  tags:
+    - single_node_cmds
+
 - name: Apply Consul License Blob
   command: /usr/local/bin/consul license put "{{ consul_license_blob }}"
   tags:
-    - consul_license
+    - single_node_cmds
+
+- name: Create /etc/prometheus Directory
+  file:
+    path: /etc/prometheus
+    recurse: yes
+    state: directory
+  tags:
+    - single_node_cmds
+
+- name: Template prometheus Configuration File
+  template:
+    src: ./template/prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+  tags:
+    - single_node_cmds
+
+- name: Enable and Start Docker Service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Start a grafana container
+  docker_container:
+    name: grafana
+    image: grafana/grafana
+    state: started
+    ports:
+      - "3000:3000"
+  tags:
+    - single_node_cmds
+
+- name: Start a prometheus container
+  docker_container:
+    name: prometheus
+    image: prom/prometheus
+    state: started
+    ports:
+      - "9090:9090"
+    volumes:
+      - /etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  tags:
+    - single_node_cmds

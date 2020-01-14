@@ -1,0 +1,21 @@
+global:
+  scrape_interval:     2s
+  evaluation_interval: 2s
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+
+rule_files:
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+    - targets: ['localhost:9090']
+  - job_name: 'consul'
+    static_configs:
+    - targets: [{% for node in node_server_ips %}'{{ node }}:8500'{% if not loop.last %},{% endif %}{% endfor %}]
+    metrics_path: "/v1/agent/metrics"
+    params:
+      format: ['prometheus']
