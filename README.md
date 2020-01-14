@@ -5,6 +5,7 @@ This is a completely automated way to deploy Consul with multiple network segmen
 This project uses Ansible in a null_resource local-exec provisioner.  Everytime you run a `terraform apply`, it will rerun the the local-exec provisioners.  This is handy if you make variable changes and just want to apply the updates without destroying everything.  This also means that you are running Ansible locally and will need it installed.
 
 Run the normal Terraform commands and you should be good to go!
+
 `terraform init`
 
 `terraform plan`
