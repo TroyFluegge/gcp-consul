@@ -82,6 +82,8 @@
     owner: consul
     group: consul
     mode: '0640'
+  notify:
+    - restart consul
 
 - name: Template Server Configuration File
   template:
@@ -90,6 +92,8 @@
     owner: consul
     group: consul
     mode: '0640'
+  notify:
+    - restart consul
 
 - name: Template Network Segments Configuration File
   template:
@@ -98,6 +102,8 @@
     owner: consul
     group: consul
     mode: '0640'
+  notify:
+    - restart consul
 
 - name: Enable and Start Consul Service
   systemd:
