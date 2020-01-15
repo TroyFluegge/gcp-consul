@@ -13,3 +13,6 @@ bind_addr = {% raw %}"{{GetInterfaceIP \"eth0\"}}"
 segment = "{{ subnet_name.content | basename }}"
 {% endif %}
 telemetry { prometheus_retention_time = "4s" }
+connect {
+  enabled = true
+}
