@@ -16,10 +16,11 @@
     - tcpdump
     - docker
     - docker-python
+    - bind-utils
 
 - name: Install Consul
   unarchive:
-    src: https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/consul/ent/1.7.0/consul-enterprise_1.7.0%2Bent-beta2_linux_amd64.zip
+    src: https://releases.hashicorp.com/consul/1.7.3+ent/consul_1.7.3+ent_linux_amd64.zip
     dest: /usr/local/bin
     remote_src: yes
 
